@@ -14,7 +14,11 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
         jcenter()
+        maven {
+            url 'https://maven.xtremelabs.com/artifactory/libs-release-local'
+        }
     }
 }
 
