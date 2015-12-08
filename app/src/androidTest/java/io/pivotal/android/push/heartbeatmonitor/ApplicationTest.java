@@ -1,4 +1,4 @@
-package io.pivotal.push.android.heartbeatmonitor;
+package io.pivotal.android.push.heartbeatmonitor;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

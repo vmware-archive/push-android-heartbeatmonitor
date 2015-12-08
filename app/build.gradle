@@ -5,8 +5,8 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "io.pivotal.push.android.heartbeatmonitor"
-        minSdkVersion 21
+        applicationId "io.pivotal.android.push.heartbeatmonitor"
+        minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -32,4 +32,5 @@ dependencies {
     compile 'com.google.dagger:dagger-compiler:2.0.2'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'io.pivotal.android:push:1.4.0'
+    compile 'com.google.guava:guava:18.0'
 }

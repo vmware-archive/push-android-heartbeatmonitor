@@ -11,15 +11,31 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="io.pivotal.push.android.heartbeatmonitor.MainActivity"
+    tools:context="io.pivotal.android.push.heartbeatmonitor.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <ImageView
         android:id="@+id/heart"
-        android:layout_width="256dp"
-        android:layout_height="256dp"
+        android:layout_width="340dp"
+        android:layout_height="340dp"
         android:layout_centerHorizontal="true"
         android:src="@drawable/heart"
         android:contentDescription="@string/heartbeat_content_description"/>
+
+    <TextView
+        android:id="@+id/serviceUrl"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
+
+    <TextView
+        android:id="@+id/counter"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/serviceUrl"/>
 
 </RelativeLayout>

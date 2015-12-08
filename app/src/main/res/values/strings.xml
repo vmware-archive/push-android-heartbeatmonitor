@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">Heartbeat Monitor</string>
+    <string name="app_name">PCF Push Heartbeat Monitor</string>
     <string name="action_settings">Settings</string>
     <string name="heartbeat_content_description">Heartbeat</string>
+    <string name="registration_error">Registration error!</string>
+    <string name="registering">Registering…</string>
+    <string name="monitoring">"Monitoring %1$s."</string>
+    <string name="heartbeat_counter">"Received %1$d heartbeats."</string>
 </resources>
