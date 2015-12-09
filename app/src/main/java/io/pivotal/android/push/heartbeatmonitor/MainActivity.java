@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.animation.Animation;
@@ -18,6 +21,8 @@ import android.widget.TextView;
 import com.google.common.collect.ImmutableSet;
 
 import java.net.URI;
+import java.util.Date;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -29,14 +34,20 @@ import io.pivotal.android.push.registration.RegistrationListener;
 public class MainActivity extends AppCompatActivity {
 
     public static final String HEARTBEAT_RECEIVED = "io.pivotal.android.push.heartbeatmonitor.HEARTBEAT_RECEIVED";
+    public static final int TIMESTAMP_UPDATE_INTERVAL = 20000;
 
-    @Bind(R.id.heart) ImageView heartView;
-    @Bind(R.id.toolbar) Toolbar toolbar;
-    @Bind(R.id.serviceUrl) TextView serviceUrlTextView;
-    @Bind(R.id.counter) TextView counterTextView;
+    @Bind(R.id.heart)
+    ImageView heartView;
+
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
+    @Bind({R.id.text1, R.id.text2, R.id.text3})
+    List<TextView> textViews;
 
     private BroadcastReceiver receiver;
     private boolean isRegistered = false;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,62 +57,14 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-
-        try {
-
-            serviceUrlTextView.setText(R.string.registering);
-
-            final ImmutableSet<String> tags = ImmutableSet.of("heartbeat");
-            Push.getInstance(this).startRegistration(Build.MODEL, tags, false, new RegistrationListener() {
-
-                @Override
-                public void onRegistrationComplete() {
-                    Log.i(Const.LOG_TAG, "Registration with PCF Push successful. Device ID is: " + Push.getInstance(MainActivity.this).getDeviceUuid());
-
-                    runOnUiThread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            isRegistered = true;
-                            final String serviceUrl = Pivotal.getServiceUrl(MainActivity.this);
-                            final URI uri = URI.create(serviceUrl);
-                            serviceUrlTextView.setText(getString(R.string.monitoring, uri.getHost()));
-                            updateHeartbeatCounter();
-                        }
-                    });
-                }
-
-                @Override
-                public void onRegistrationFailed(final String s) {
-                    Log.e(Const.LOG_TAG, "Registration with PCF Push failed: " + s);
-                    runOnUiThread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            counterTextView.setText(R.string.registration_error);
-                            serviceUrlTextView.setText(s);
-                        }
-                    });
-                }
-            });
-
-        } catch (Exception e) {
-
-            Log.e(Const.LOG_TAG, "Exception registering for PCF Push: " + e.getLocalizedMessage());
-            counterTextView.setText(R.string.registration_error);
-            if (e.getLocalizedMessage() != null) {
-                serviceUrlTextView.setText(e.getLocalizedMessage());
-            } else {
-                serviceUrlTextView.setText(e.toString());
-            }
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        updateHeartbeatCounter();
+        startPushRegistration();
+        startUpdateTask();
 
         final IntentFilter intentFilter = new IntentFilter(HEARTBEAT_RECEIVED);
         receiver = new BroadcastReceiver() {
@@ -120,12 +83,87 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, intentFilter);
     }
 
+    private void startPushRegistration() {
+
+        try {
+
+            textViews.get(0).setText("");
+            textViews.get(1).setText("");
+            textViews.get(2).setText(R.string.registering);
+
+            final ImmutableSet<String> tags = ImmutableSet.of("heartbeat");
+            Push.getInstance(this).startRegistration(Build.MODEL, tags, false, new RegistrationListener() {
+
+                @Override
+                public void onRegistrationComplete() {
+                    Log.i(Const.LOG_TAG, "Registration with PCF Push successful. Device ID is: " + Push.getInstance(MainActivity.this).getDeviceUuid());
+
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            isRegistered = true;
+                            final String serviceUrl = Pivotal.getServiceUrl(MainActivity.this);
+                            final URI uri = URI.create(serviceUrl);
+                            textViews.get(2).setText(getString(R.string.monitoring, uri.getHost()));
+                            updateHeartbeatCounter();
+                        }
+                    });
+                }
+
+                @Override
+                public void onRegistrationFailed(final String s) {
+                    Log.e(Const.LOG_TAG, "Registration with PCF Push failed: " + s);
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            textViews.get(0).setText("");
+                            textViews.get(1).setText(R.string.registration_error);
+                            textViews.get(2).setText(s);
+                        }
+                    });
+                }
+            });
+
+        } catch (Exception e) {
+
+            Log.e(Const.LOG_TAG, "Exception registering for PCF Push: " + e.getLocalizedMessage());
+            textViews.get(1).setText(R.string.registration_error);
+            textViews.get(0).setText("");
+            if (e.getLocalizedMessage() != null) {
+                textViews.get(2).setText(e.getLocalizedMessage());
+            } else {
+                textViews.get(2).setText(e.toString());
+            }
+        }
+    }
+
+    private void startUpdateTask() {
+        handler = new Handler();
+        handler.postDelayed(updateTask, TIMESTAMP_UPDATE_INTERVAL);
+    }
+
+    private Runnable updateTask = new Runnable() {
+
+        @Override
+        public void run() {
+            updateHeartbeatCounter();
+            handler.postDelayed(updateTask, TIMESTAMP_UPDATE_INTERVAL);
+        }
+    };
+
     @Override
     protected void onPause() {
         super.onPause();
 
         unregisterReceiver(receiver);
         heartView = null;
+
+        if (handler != null) {
+            handler.removeCallbacks(updateTask);
+        }
+        handler = null;
     }
 
     @Override
@@ -153,13 +191,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateHeartbeatCounter() {
-        if (counterTextView != null) {
-            if (isRegistered) {
-                final int heartbeatCounter = Preferences.getHeartbeatCounter(this);
-                counterTextView.setText(getString(R.string.heartbeat_counter, heartbeatCounter));
+
+        final int heartbeatCounter = Preferences.getHeartbeatCounter(this);
+        final long latestTimestamp = Preferences.getLastTimestamp(this);
+
+        if (isRegistered) {
+
+            if (latestTimestamp > 0) {
+                textViews.get(0).setText(getFormattedCounterScreen(heartbeatCounter));
+                setTimestampInTextView(latestTimestamp);
             } else {
-                counterTextView.setText("");
+                textViews.get(0).setText("");
+                textViews.get(1).setText(getFormattedCounterScreen(heartbeatCounter));
             }
+
+        } else {
+            textViews.get(0).setText("");
+            textViews.get(1).setText("");
         }
+    }
+
+    private void setTimestampInTextView(final long timestamp) {
+        final long difference = new Date().getTime() - timestamp;
+
+        if (difference < 60000) {
+            textViews.get(1).setText(getString(R.string.last_timestamp_less_than_minute_ago));
+        } else {
+            textViews.get(1).setText(getString(R.string.last_timestamp, DateUtils.getRelativeTimeSpanString(timestamp)));
+        }
+    }
+
+    @NonNull
+    private String getFormattedCounterScreen(int heartbeatCounter) {
+        return getResources().getQuantityString(R.plurals.heartbeat_counter, heartbeatCounter, heartbeatCounter);
     }
 }

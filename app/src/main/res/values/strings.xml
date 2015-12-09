@@ -5,5 +5,10 @@
     <string name="registration_error">Registration error!</string>
     <string name="registering">Registering…</string>
     <string name="monitoring">"Monitoring %1$s."</string>
-    <string name="heartbeat_counter">"Received %1$d heartbeats."</string>
+    <string name="last_timestamp">"Last heartbeat received %1$s."</string>
+    <string name="last_timestamp_less_than_minute_ago">Last heartbeat received moments ago.</string>
+    <plurals name ="heartbeat_counter">
+        <item quantity="one">"Received %d heartbeat."</item>
+        <item quantity="other">"Received %d heartbeats."</item>
+    </plurals>
 </resources>

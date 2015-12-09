@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TIMESTAMP="date +%s000"
+
+curl -k 'https://push-api.gulch.cf-app.com/v1/push' \
+  -H 'Authorization: Basic NzQxMjk2NWQtM2M5MS00M2UxLTg2NzAtYzBjODM5ZDFlMTcxOjU2MmExZWU5LWZmNWItNDRlOS1hMzJmLTE3Y2U1NTQwZDVjOQ==' \
+  -H 'Content-Type: application/json;charset=UTF-8' \
+  --data-binary "{\"message\":{\"body\":\"heartbeat message\",\"custom\":{\"android\":{\"pcf.push.heartbeat.sentAt\":\"$TIMESTAMP\"}}},\"target\":{\"tags\":[\"heartbeat\"]}}"

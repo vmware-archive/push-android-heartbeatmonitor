@@ -23,7 +23,7 @@
         android:contentDescription="@string/heartbeat_content_description"/>
 
     <TextView
-        android:id="@+id/serviceUrl"
+        android:id="@+id/text3"
         android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,11 +31,19 @@
         android:layout_alignParentBottom="true"/>
 
     <TextView
-        android:id="@+id/counter"
+        android:id="@+id/text2"
         android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_above="@id/serviceUrl"/>
+        android:layout_above="@id/text3"/>
+
+    <TextView
+        android:id="@+id/text1"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/text2"/>
 
 </RelativeLayout>
