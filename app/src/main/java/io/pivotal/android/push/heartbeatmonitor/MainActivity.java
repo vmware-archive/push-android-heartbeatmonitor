@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.counter) TextView counterTextView;
 
     private BroadcastReceiver receiver;
+    private boolean isRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,22 +62,38 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void run() {
+                            isRegistered = true;
                             final String serviceUrl = Pivotal.getServiceUrl(MainActivity.this);
                             final URI uri = URI.create(serviceUrl);
                             serviceUrlTextView.setText(getString(R.string.monitoring, uri.getHost()));
+                            updateHeartbeatCounter();
                         }
                     });
                 }
 
                 @Override
-                public void onRegistrationFailed(String s) {
+                public void onRegistrationFailed(final String s) {
                     Log.e(Const.LOG_TAG, "Registration with PCF Push failed: " + s);
-                    serviceUrlTextView.setText(R.string.registration_error);
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            counterTextView.setText(R.string.registration_error);
+                            serviceUrlTextView.setText(s);
+                        }
+                    });
                 }
             });
 
         } catch (Exception e) {
+
             Log.e(Const.LOG_TAG, "Exception registering for PCF Push: " + e.getLocalizedMessage());
+            counterTextView.setText(R.string.registration_error);
+            if (e.getLocalizedMessage() != null) {
+                serviceUrlTextView.setText(e.getLocalizedMessage());
+            } else {
+                serviceUrlTextView.setText(e.toString());
+            }
         }
     }
 
@@ -137,8 +154,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateHeartbeatCounter() {
         if (counterTextView != null) {
-            final int heartbeatCounter = Preferences.getHeartbeatCounter(this);
-            counterTextView.setText(getString(R.string.heartbeat_counter, heartbeatCounter));
+            if (isRegistered) {
+                final int heartbeatCounter = Preferences.getHeartbeatCounter(this);
+                counterTextView.setText(getString(R.string.heartbeat_counter, heartbeatCounter));
+            } else {
+                counterTextView.setText("");
+            }
         }
     }
 }
