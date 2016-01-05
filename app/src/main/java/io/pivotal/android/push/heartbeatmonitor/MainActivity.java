@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             textViews.get(1).setText("");
             textViews.get(2).setText(R.string.registering);
 
-            final ImmutableSet<String> tags = ImmutableSet.of("heartbeat");
+            final ImmutableSet<String> tags = ImmutableSet.of("pcf.push.heartbeat");
             Push.getInstance(this).startRegistration(Build.MODEL, tags, false, new RegistrationListener() {
 
                 @Override
