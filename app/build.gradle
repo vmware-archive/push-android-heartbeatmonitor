@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+ext {
+    debugKeystorePath = System.getenv("PUSH_DEBUG_SIGNING_KEY") ?: new File(System.getProperty('user.home'), '.android').absolutePath + "/PCFPush.android.debug.keystore"
+    println "Using debugKeystorePath: " + debugKeystorePath
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -12,6 +17,19 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        debug {
+            storeFile file(debugKeystorePath)
+        }
+
+//        myConfig {
+//            storeFile file("other.keystore")
+//            storePassword "android"
+//            keyAlias "androiddebugkey"
+//            keyPassword "android"
+//        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -21,10 +39,10 @@ android {
 }
 
 dependencies {
-    testCompile 'junit:junit:4.12'
+    compile pushSdk
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.jakewharton:butterknife:7.0.1'
-    compile pushSdk
     compile 'com.google.guava:guava:18.0'
+    testCompile 'junit:junit:4.12'
 }
