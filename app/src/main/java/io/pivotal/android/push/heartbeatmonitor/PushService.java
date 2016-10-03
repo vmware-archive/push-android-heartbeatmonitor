@@ -16,15 +16,16 @@
 package io.pivotal.android.push.heartbeatmonitor;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 
-import io.pivotal.android.push.service.GcmService;
+import java.util.Map;
 
-public class PushService extends GcmService {
+import io.pivotal.android.push.fcm.FcmMessagingService;
+
+public class PushService extends FcmMessagingService {
 
     @Override
-    public void onReceiveHeartbeat(Bundle payload) {
+    public void onReceiveHeartbeat(Map<String, String> heartbeat) {
         Log.i(Const.LOG_TAG, "Received heartbeat.");
 
         Preferences.tickHeartbeatCounter(this);
