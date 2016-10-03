@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
         startPushRegistration();
         startUpdateTask();
 
+        setTitle(R.string.app_name);
+
         final IntentFilter intentFilter = new IntentFilter(HEARTBEAT_RECEIVED);
         receiver = new BroadcastReceiver() {
 
