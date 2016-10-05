@@ -20,27 +20,13 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name="io.pivotal.android.push.receiver.GcmBroadcastReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
-                <category android:name="io.pivotal.android.push.heartbeatmonitor" />
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".PushService"
-            android:exported="false" />
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
 
     </application>
-
-    <permission
-        android:name="io.pivotal.android.push.heartbeatmonitor.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-    <uses-permission android:name="io.pivotal.android.push.heartbeatmonitor.permission.C2D_MESSAGE" />
-
-
 </manifest>

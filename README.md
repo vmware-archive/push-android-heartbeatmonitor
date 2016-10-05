@@ -4,9 +4,9 @@ The Heartbeat Monitor was designed to help PCF operators ensure their Push Notif
 
 ## Pre-requisites
 
-This app requires release v1.5.0+ of the [PCF Push Notification Tile](https://network.pivotal.io/products/push-notification-service#/releases/) to work. Heartbeat App will automatically be installed in your push-service-instance. 
+This app requires release v1.7.0+ of the [PCF Push Notification Tile](https://network.pivotal.io/products/push-notification-service#/releases/) to work. Heartbeat App will automatically be installed in your push-service-instance. 
 
-__Note:__ Make sure you have added a valid Google GCM Key to your Android platform.
+__Note:__ Make sure you have added a valid Firebase Cloud Messaging Server Key to your Android FCM platform.
 
 ## Setup
 
@@ -14,17 +14,20 @@ Begin by cloning the repo and using the closest release that matches your PCF in
 
 `git clone git@github.com:cfmobile/push-android-heartbeatmonitor.git`
 
+Then create an application inside your Firebase Project through the Google Firebase Console. 
+__Note:__ Ensure your app SHA1 certificate fingerprint of the app in the Firebase console matches the one in the keystore used to sign the heartbeat monitor.``
+
+Once created, download the config file `google-service.json` and move it to the project under the `app` directory.
+
+
 There is a file that you will need to modify:
 
-1. Open the project in Anroid Studio
+1. Open the project in Android Studio
 
 1. In the Project Navigator, navigate to res/raw/pivotal.properties
 
-1. Change the GCM Sender ID to match your GCM Key 
-    - __Note:__ You can find this online at your Google Developer Console under "Project Information"
-
 1. Change the pivotal.push.serviceUrl field by replacing `push-api.your.env.com` with your push-api url
-    - __Note:__ Ensure the platform UUID and platform secret match the iOS platform found in your Configuration tab on your Push Dashboard _(They should by default)_
+    - __Note:__ Ensure the platform UUID and platform secret match the Android FCM platform found in your Configuration tab on your Push Dashboard _(They should by default)_
 
 1. Build the Heartbeat Monitor on an Android Jellybean or later device
 
