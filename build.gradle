@@ -13,7 +13,25 @@ buildscript {
     }
 }
 
+def getSdkDirFromLocalProperties() {
+    def rootDir = project.rootDir
+    def localProperties = new File(rootDir, "local.properties")
+    Properties properties = new Properties()
+    localProperties.withInputStream { instr ->
+        properties.load(instr)
+    }
+    properties.getProperty('sdk.dir')
+}
+
+def androidHome = System.env['ANDROID_HOME']
+
+def androidHomeIsDefined = androidHome?.trim()
+
+def sdkDir = androidHomeIsDefined ? androidHome : getSdkDirFromLocalProperties()
+
 subprojects {
+
+    println "SDK dir: $sdkDir"
 
     ext {
         // Pivotal CF Mobile Services dependencies
@@ -26,6 +44,8 @@ subprojects {
         mavenLocal()
         jcenter()
         maven {
+            maven { url "file://$sdkDir/extras/android/m2repository" }
+            maven { url "file://$sdkDir/extras/google/m2repository" }
             url 'https://maven.xtremelabs.com/artifactory/libs-release-local'
         }
     }
