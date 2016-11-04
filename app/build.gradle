@@ -1,7 +1,9 @@
 apply plugin: 'com.android.application'
 
 ext {
+    debugKeystorePath = System.getenv("PUSH_DEBUG_SIGNING_KEY") ?: new File(System.getProperty('user.home'), '.android').absolutePath + "/PCFPush.android.debug.keystore"
     env = System.getenv("PUSH_ANDROID_ENV") ?: "kitkat" // Use the PUSH_ANDROID_DEV environment variable to override the environment name
+    println "Using debugKeystorePath: " + debugKeystorePath
     println "Using environment: " + env
 }
 
@@ -20,6 +22,9 @@ android {
     }
 
     signingConfigs {
+        debug {
+            storeFile file(debugKeystorePath)
+        }
 //        myConfig {
 //            storeFile file("other.keystore")
 //            storePassword "android"
