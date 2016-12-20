@@ -43,10 +43,6 @@ subprojects {
     repositories {
         mavenLocal()
         jcenter()
-        maven {
-            maven { url "file://$sdkDir/extras/android/m2repository" }
-            maven { url "file://$sdkDir/extras/google/m2repository" }
-        }
     }
 }
 
