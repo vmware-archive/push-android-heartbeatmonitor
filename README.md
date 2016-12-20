@@ -4,7 +4,7 @@ The Heartbeat Monitor was designed to help PCF operators ensure their Push Notif
 
 ## Pre-requisites
 
-This app requires release v1.7.0+ of the [PCF Push Notification Tile](https://network.pivotal.io/products/push-notification-service#/releases/) to work. Heartbeat App will automatically be installed in your push-service-instance. 
+This app requires release v1.7.0+ of the [PCF Push Notification Tile](https://network.pivotal.io/products/push-notification-service#/releases/) to work. Heartbeat App will automatically be installed in your push-service-instance.
 
 __Note:__ Make sure you have added a valid Firebase Cloud Messaging Server Key to your Android FCM platform.
 
@@ -14,7 +14,14 @@ Begin by cloning the repo and using the closest release that matches your PCF in
 
 `git clone git@github.com:cfmobile/push-android-heartbeatmonitor.git`
 
-Then create an application inside your Firebase Project through the Google Firebase Console. 
+__IMPORTANT__: Before building this project you need to build [Push Android SDK](https://github.com/cfmobile/push-android/tree/dev)
+by
+
+`./gradlew --info printVersion clean uploadArchives`
+
+It will build and publish .aar and .pom to your local maven repository.
+
+Then create an application inside your Firebase Project through the Google Firebase Console.
 __Note:__ Ensure your app SHA1 certificate fingerprint of the app in the Firebase console matches the one in the keystore used to sign the heartbeat monitor.``
 
 Once created, download the config file `google-service.json` and move it to the project under the `app` directory.
@@ -34,6 +41,3 @@ There is a file that you will need to modify:
 1. Accept Push Notifications on the device
 
 1. Ensure the device shows up in the Devices tab of your Android Platform on your Push Dashboard
-
-
-
