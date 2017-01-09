@@ -17,14 +17,14 @@ subprojects {
 
     ext {
         // Pivotal CF Mobile Services dependencies
-        pushSdkVersionName = System.getenv("PUSH_SDK_VERSION") ?: "1.7.0"
+        pushSdkVersionName = System.getenv("PUSH_SDK_VERSION") ?: "1.8.0"
         pushSdk = 'io.pivotal.android:push:' + pushSdkVersionName
 
         println "Using Push SDK version: " + pushSdkVersionName
     }
     repositories {
         mavenLocal()
-        jcenter()
+        mavenCentral()
     }
 }
 
