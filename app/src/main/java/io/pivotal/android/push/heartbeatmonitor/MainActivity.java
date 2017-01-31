@@ -15,8 +15,10 @@
 
 package io.pivotal.android.push.heartbeatmonitor;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
@@ -28,8 +30,10 @@ import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,7 +47,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.pivotal.android.push.Push;
-import io.pivotal.android.push.prefs.Pivotal;
+import io.pivotal.android.push.PushPlatformInfo;
 import io.pivotal.android.push.registration.RegistrationListener;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver receiver;
     private boolean isRegistered = false;
     private Handler handler;
+    private PushPlatformInfo platformInfo = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,13 +77,13 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
+        requestPushPlatformInformation();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        startPushRegistration();
         startUpdateTask();
 
         setTitle(R.string.app_name);
@@ -100,6 +105,25 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, intentFilter);
     }
 
+    private void requestPushPlatformInformation() {
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(getString(R.string.title_push_platform_dlg));
+        final View view = alertDialog.getLayoutInflater().inflate(R.layout.platform_info, null);
+        alertDialog.setView(view);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.OK), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String serverUrl = ((EditText)view.findViewById(R.id.server_url)).getText().toString();
+                final String platformUuid = ((EditText)view.findViewById(R.id.platform_uuid)).getText().toString();
+                final String platformSecret = ((EditText)view.findViewById(R.id.platform_secret)).getText().toString();
+                platformInfo = new PushPlatformInfo(serverUrl, platformUuid, platformSecret);
+
+                startPushRegistration();
+            }
+        });
+        alertDialog.show();
+    }
+
     private void startPushRegistration() {
 
         try {
@@ -109,7 +133,10 @@ public class MainActivity extends AppCompatActivity {
             textViews.get(2).setText(R.string.registering);
 
             final ImmutableSet<String> tags = ImmutableSet.of("pcf.push.heartbeat");
-            Push.getInstance(this).startRegistration(Build.MODEL, tags, false, new RegistrationListener() {
+            Push push = Push.getInstance(this);
+
+            push.setPlatformInfo(platformInfo);
+            push.startRegistration(Build.MODEL, tags, false, new RegistrationListener() {
 
                 @Override
                 public void onRegistrationComplete() {
@@ -120,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             isRegistered = true;
-                            final String serviceUrl = Pivotal.getServiceUrl(MainActivity.this);
+                            final String serviceUrl = platformInfo.getBaseServerUrl();
                             final URI uri = URI.create(serviceUrl);
                             textViews.get(2).setText(getString(R.string.monitoring, uri.getHost()));
                             updateHeartbeatCounter();
