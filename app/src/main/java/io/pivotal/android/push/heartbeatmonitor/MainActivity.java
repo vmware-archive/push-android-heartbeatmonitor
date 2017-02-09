@@ -61,13 +61,12 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind({R.id.text1, R.id.text2, R.id.text3})
+    @Bind({R.id.text1, R.id.text2, R.id.text3, R.id.text4, R.id.text5})
     List<TextView> textViews;
 
     private BroadcastReceiver receiver;
     private boolean isRegistered = false;
     private Handler handler;
-    private PushPlatformInfo platformInfo = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,33 +108,47 @@ public class MainActivity extends AppCompatActivity {
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(getString(R.string.title_push_platform_dlg));
         final View view = alertDialog.getLayoutInflater().inflate(R.layout.platform_info, null);
+
+        final EditText serverUrlTextField = (EditText) view.findViewById(R.id.server_url);
+        final EditText platformUuidTextField = (EditText) view.findViewById(R.id.platform_uuid);
+        final EditText platformSecretTextField = (EditText) view.findViewById(R.id.platform_secret);
+        serverUrlTextField.setText(Preferences.getServiceUrl(this));
+        platformUuidTextField.setText(Preferences.getPlatformUuid(this));
+        platformSecretTextField.setText(Preferences.getPlatformSecret(this));
+
         alertDialog.setView(view);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.OK), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                final String serverUrl = ((EditText)view.findViewById(R.id.server_url)).getText().toString();
-                final String platformUuid = ((EditText)view.findViewById(R.id.platform_uuid)).getText().toString();
-                final String platformSecret = ((EditText)view.findViewById(R.id.platform_secret)).getText().toString();
-                platformInfo = new PushPlatformInfo(serverUrl, platformUuid, platformSecret);
 
-                startPushRegistration();
+            final String serverUrl = serverUrlTextField.getText().toString();
+            final String platformUuid = platformUuidTextField.getText().toString();
+            final String platformSecret = platformSecretTextField.getText().toString();
+
+            storePlatformInfoDetails(serverUrl, platformUuid, platformSecret);
+
+            startPushRegistration(serverUrl, platformUuid, platformSecret);
             }
         });
         alertDialog.show();
     }
 
-    private void startPushRegistration() {
+    private void startPushRegistration(final String serverUrl, final String platformUuid, final String platformSecret) {
 
         try {
 
             textViews.get(0).setText("");
             textViews.get(1).setText("");
             textViews.get(2).setText(R.string.registering);
+            textViews.get(3).setText("");
+            textViews.get(4).setText("");
 
             final ImmutableSet<String> tags = ImmutableSet.of("pcf.push.heartbeat");
-            Push push = Push.getInstance(this);
+            final PushPlatformInfo platformInfo = new PushPlatformInfo(serverUrl, platformUuid, platformSecret);
 
+            Push push = Push.getInstance(this);
             push.setPlatformInfo(platformInfo);
+
             push.startRegistration(Build.MODEL, tags, false, new RegistrationListener() {
 
                 @Override
@@ -147,9 +160,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             isRegistered = true;
-                            final String serviceUrl = platformInfo.getBaseServerUrl();
-                            final URI uri = URI.create(serviceUrl);
-                            textViews.get(2).setText(getString(R.string.monitoring, uri.getHost()));
+                            displayPlatformInfoDetails(platformInfo);
                             updateHeartbeatCounter();
                         }
                     });
@@ -165,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
                             textViews.get(0).setText("");
                             textViews.get(1).setText(R.string.registration_error);
                             textViews.get(2).setText(s);
+                            textViews.get(3).setText("");
+                            textViews.get(4).setText("");
                         }
                     });
                 }
@@ -263,6 +276,22 @@ public class MainActivity extends AppCompatActivity {
         } else {
             textViews.get(1).setText(getString(R.string.last_timestamp, DateUtils.getRelativeTimeSpanString(timestamp)));
         }
+    }
+
+    private void displayPlatformInfoDetails(final PushPlatformInfo platformInfo) {
+        final String serviceUrl = platformInfo.getBaseServerUrl();
+        final String platformUuid = platformInfo.getPlatformUuid();
+        final String platformSecret = platformInfo.getPlatformSecret();
+        final URI uri = URI.create(serviceUrl);
+        textViews.get(2).setText(getString(R.string.monitoring, uri.toString()));
+        textViews.get(3).setText(getString(R.string.monitor_platform_uuid, platformUuid));
+        textViews.get(4).setText(getString(R.string.monitor_platform_secret, platformSecret));
+    }
+
+    private void storePlatformInfoDetails(final String serviceUrl, final String platformUuid, final String platformSecret) {
+        Preferences.setServiceUrl(this, serviceUrl);
+        Preferences.setPlatformUuid(this, platformUuid);
+        Preferences.setPlatformSecret(this, platformSecret);
     }
 
     @NonNull
