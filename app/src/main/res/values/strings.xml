@@ -12,10 +12,11 @@
     <string name="title_server_url">Server URL</string>
     <string name="hint_server_url">http://example.com</string>
     <string name="title_platform_uuid">Platform UUID</string>
-    <string name="hint_platform_uuid">35decce0–8092-4afb-88c6-500ef0f4f2c5</string>
+    <string name="hint_platform_uuid">35decce0-8092-4afb-88c6-500ef0f4f2c5</string>
     <string name="title_platform_secret">Platform Secret</string>
     <string name="hint_platform_secret">3a5175eb-002a-471d-a654-b7aff5f991d1</string>
     <string name="title_push_platform_dlg">Push Platform Information</string>
+    <string name="activity_name">PCF Push Heartbeat Monitor</string>
     <string name="OK">OK</string>
     <plurals name ="heartbeat_counter">
         <item quantity="one">"Received %d heartbeat."</item>
