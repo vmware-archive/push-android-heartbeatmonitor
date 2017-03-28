@@ -47,7 +47,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.pivotal.android.push.Push;
-import io.pivotal.android.push.PushPlatformInfo;
+import io.pivotal.android.push.PushServiceInfo;
 import io.pivotal.android.push.registration.RegistrationListener;
 
 public class MainActivity extends AppCompatActivity {
@@ -144,10 +144,14 @@ public class MainActivity extends AppCompatActivity {
             textViews.get(4).setText("");
 
             final ImmutableSet<String> tags = ImmutableSet.of("pcf.push.heartbeat");
-            final PushPlatformInfo platformInfo = new PushPlatformInfo(serverUrl, platformUuid, platformSecret);
+            final PushServiceInfo pushServiceInfo = PushServiceInfo.Builder()
+                    .setServiceUrl(serverUrl)
+                    .setPlatformUuid(platformUuid)
+                    .setPlatformSecret(platformSecret)
+                    .build();
 
             Push push = Push.getInstance(this);
-            push.setPlatformInfo(platformInfo);
+            push.setPushServiceInfo(pushServiceInfo);
 
             push.startRegistration(Build.MODEL, tags, false, new RegistrationListener() {
 
@@ -160,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             isRegistered = true;
-                            displayPlatformInfoDetails(platformInfo);
+                            displayPlatformInfoDetails(pushServiceInfo);
                             updateHeartbeatCounter();
                         }
                     });
@@ -278,10 +282,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void displayPlatformInfoDetails(final PushPlatformInfo platformInfo) {
-        final String serviceUrl = platformInfo.getBaseServerUrl();
-        final String platformUuid = platformInfo.getPlatformUuid();
-        final String platformSecret = platformInfo.getPlatformSecret();
+    private void displayPlatformInfoDetails(final PushServiceInfo pushServiceInfo) {
+        final String serviceUrl = pushServiceInfo.getServiceUrl();
+        final String platformUuid = pushServiceInfo.getPlatformUuid();
+        final String platformSecret = pushServiceInfo.getPlatformSecret();
         final URI uri = URI.create(serviceUrl);
         textViews.get(2).setText(getString(R.string.monitoring, uri.toString()));
         textViews.get(3).setText(getString(R.string.monitor_platform_uuid, platformUuid));
