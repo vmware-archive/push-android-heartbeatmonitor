@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package io.pivotal.android.push.heartbeatmonitor;
+package io.pivotal.android.push.heartbeatmonitor.activity;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -39,6 +39,7 @@ import android.widget.TextView;
 
 import com.google.common.collect.ImmutableSet;
 
+import io.pivotal.android.push.prefs.Pivotal.SslCertValidationMode;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +49,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.pivotal.android.push.Push;
 import io.pivotal.android.push.PushServiceInfo;
+import io.pivotal.android.push.heartbeatmonitor.Const;
+import io.pivotal.android.push.heartbeatmonitor.Preferences;
+import io.pivotal.android.push.heartbeatmonitor.R;
 import io.pivotal.android.push.registration.RegistrationListener;
 
 public class MainActivity extends AppCompatActivity {
@@ -148,12 +152,14 @@ public class MainActivity extends AppCompatActivity {
                     .setServiceUrl(serverUrl)
                     .setPlatformUuid(platformUuid)
                     .setPlatformSecret(platformSecret)
+                    .setSSLCertValidationMode(SslCertValidationMode.TRUST_ALL)
                     .build();
 
             Push push = Push.getInstance(this);
             push.setPushServiceInfo(pushServiceInfo);
 
-            push.startRegistration(Build.MODEL, tags, false, new RegistrationListener() {
+            push.setBaiduAPIKey("im4paiROwZUK0MZjGih4nvGP");
+            push.startRegistration(Build.MODEL, tags, new RegistrationListener() {
 
                 @Override
                 public void onRegistrationComplete() {

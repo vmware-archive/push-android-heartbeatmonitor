@@ -21,7 +21,7 @@ import android.preference.PreferenceManager;
 
 import java.util.Date;
 
-class Preferences {
+public class Preferences {
 
     private static final String HEARTBEAT_COUNTER = "heartbeat_counter";
     private static final String HEARTBEAT_LAST_TIMESTAMP = "heartbeat_last_timestamp";
@@ -30,32 +30,32 @@ class Preferences {
     private static final String MONITOR_PLATFORM_UUID = "monitor_platform_uuid";
     private static final String MONITOR_PLATFORM_SECRET = "monitor_platform_secret";
 
-    static int getHeartbeatCounter(final Context context) {
+    public static int getHeartbeatCounter(final Context context) {
         return getSharedPreferences(context).getInt(HEARTBEAT_COUNTER, 0);
     }
 
-    private static void setHeartbeatCounter(final Context context, final int counter) {
+    public static void setHeartbeatCounter(final Context context, final int counter) {
         final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.putInt(HEARTBEAT_COUNTER, counter);
         editor.apply();
     }
 
-    static void tickHeartbeatCounter(final Context context) {
+    public static void tickHeartbeatCounter(final Context context) {
         final int heartbeatCounter = getHeartbeatCounter(context);
         setHeartbeatCounter(context, heartbeatCounter + 1);
     }
 
-    static long getLastTimestamp(final Context context) {
+    public static long getLastTimestamp(final Context context) {
         return getSharedPreferences(context).getLong(HEARTBEAT_LAST_TIMESTAMP, 0);
     }
 
-    private static void setLastTimestamp(final Context context, final Date timestamp) {
+    public static void setLastTimestamp(final Context context, final Date timestamp) {
         final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.putLong(HEARTBEAT_LAST_TIMESTAMP, timestamp.getTime());
         editor.apply();
     }
 
-    static void tickLastTimestamp(final Context context) {
+    public static void tickLastTimestamp(final Context context) {
         setLastTimestamp(context, new Date());
     }
 
@@ -63,31 +63,31 @@ class Preferences {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    static String getServiceUrl(final Context context) {
+    public static String getServiceUrl(final Context context) {
         return getSharedPreferences(context).getString(MONITOR_SERVICE_URL, "");
     }
 
-    static String getPlatformUuid(final Context context) {
+    public static String getPlatformUuid(final Context context) {
         return getSharedPreferences(context).getString(MONITOR_PLATFORM_UUID, "");
     }
 
-    static String getPlatformSecret(final Context context) {
+    public static String getPlatformSecret(final Context context) {
         return getSharedPreferences(context).getString(MONITOR_PLATFORM_SECRET, "");
     }
 
-    static void setServiceUrl(final Context context, final String serviceUrl) {
+    public static void setServiceUrl(final Context context, final String serviceUrl) {
         final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.putString(MONITOR_SERVICE_URL, serviceUrl);
         editor.apply();
     }
 
-    static void setPlatformUuid(final Context context, final String platformUuid) {
+    public static void setPlatformUuid(final Context context, final String platformUuid) {
         final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.putString(MONITOR_PLATFORM_UUID, platformUuid);
         editor.apply();
     }
 
-    static void setPlatformSecret(final Context context, final String platformSecret) {
+    public static void setPlatformSecret(final Context context, final String platformSecret) {
         final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.putString(MONITOR_PLATFORM_SECRET, platformSecret);
         editor.apply();
