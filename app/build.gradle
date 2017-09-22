@@ -52,6 +52,6 @@ dependencies {
 }
 
 if (!getGradle().getStartParameter().getTaskRequests()
-        .toString().contains("Baidu")){
+        .toString().contains("Baidu")) {
     apply plugin: 'com.google.gms.google-services'
 }
